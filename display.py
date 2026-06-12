@@ -5,6 +5,8 @@ import perlin_noise
 import copy
 import colorsys
 
+current_player = [1]
+
 def float_to_rainbow_rgb(val):
     val %= 1
     val = max(0.0, min(1.0, val))
@@ -49,7 +51,7 @@ class InteractiveTicTacToe9x9:
 
     def draw(self, surface):
         self.tick += 1
-        self.ax = self.noise((1289103810481, self.tick)) * self.amp
+        self.ax = self.noise((12891038101, self.tick)) * self.amp
         self.ay = self.noise((12138103881, self.tick)) * self.amp
         self.amp /= 1.2
         """Draws the board and symbols onto the provided Pygame surface."""
@@ -58,12 +60,11 @@ class InteractiveTicTacToe9x9:
                 # 1. Calculate screen coordinates
                 x1 = col * self.square_size
                 y1 = row * self.square_size
-
-                # 2. Draw the background grid square
-                color = self.color1 if (row + col) % 2 == 0 else self.color2
+                color = float_to_rainbow_rgb(self.tick / 10000 + current_player[0] / 4) if (row + col) % 2 == 0 else (
+                    float_to_rainbow_rgb(self.tick / 10000 + .5 + current_player[0] / 4))
                 pygame.draw.rect(surface, color, (x1 + self.ax, y1 + self.ay, self.square_size, self.square_size))
                 # Draw grid border
-                pygame.draw.rect(surface, self.grid_color, (x1 + self.ax, y1 + self.ay, self.square_size, self.square_size), 1)
+                pygame.draw.rect(surface, color, (x1 + self.ax, y1 + self.ay, self.square_size, self.square_size), 1)
 
                 # 3. Draw X or O based on the matrix value
                 value = self.matrix[row][col]
@@ -120,7 +121,6 @@ def main():
     game_matrix = [[0 for _ in range(9)] for _ in range(9)]
 
     # Track whose turn it is: 1 = X, 2 = O
-    current_player = [1]
 
     # Define interaction logic via a lambda hook
     on_square_clicked = lambda r, c: handle_move(r, c)
